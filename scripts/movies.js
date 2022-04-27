@@ -2,21 +2,37 @@
 // On clicking book now store the selected movie in localstorage as key "movie"
 // so that you can retrive it on checkout.html page
 let container=document.querySelector("#movies");
+document.getElementById("search").addEventListener('input', function (){
+  //console.log("test")
+  updateDebounce();
 
+})
 function Searching(e){
-    let movie=document.getElementById("search").value;
-    let url=`http://www.omdbapi.com/?i=${movie}&page=apikey=56f55046`+movie;
-  console.log("tset")
-    fetch(url).then(function(res){
-        return res.json()
-    }).then(function(res){
-      console.log(res)
-    }).catch(function(err){
-        console.log("err",err)
-    })
+
+    let movie=document.getElementById("search").value//input value
+    let url=`https://www.omdbapi.com/?s=${movie}&apikey=56f55046` //server(computer) --omdb- IP-192.68.56.00 - mohan - 70750
+  
+  fetch(url)
+  .then(response => response.json()) //successfull fetch 200 201
+  .then(data => {
+    console.log(data)
+    if(data.Search)append(data.Search)
+    else  document.getElementById("movies").innerHTML="no results found"
+    
+  }).catch(err=>{// 500 404
+    document.getElementById("movies").innerHTML="no results found"
+    console.log(err)
+  });
+   
 }
 
-var updateDebounce = debounce(Searching(), 1000);
+
+
+
+
+var updateDebounce = debounce(()=>{
+  Searching()
+},1000);
  
 
 function debounce(callback, delay) {
@@ -26,27 +42,34 @@ function debounce(callback, delay) {
       clearTimeout(timeout);
 
       timeout = setTimeout(() => {
+       // console.log("debouce")
         callback(args);
         
       }, delay);
     };
   }
+// function random(){
 
+// }
+// random();
+// let random=()=>{
 
+// }
+// random();
 function append(data){
-    console.log(data);
-    container.innerHTML=null;
-    if(data.Response=="False" || data.Poster== "N/A"){
-        let image=document.createElement("img");
-        image.src="err.png";
-        image.style.width="100%";
-        
-    let button =document.createElement("button");
-    button.innerText="Book now";
-    button.style.width="15%";
-    button.style.marginBottom="20px"
-    button.addEventListener("click",function(){
-      window.location.href="movies.html";
-    });
-}
+  document.getElementById("movies").innerHTML=""
+  const fragment=document.createDocumentFragment();  
+  data.map((ele)=>{
+    const p=document.createElement("p")
+    p.innerText=ele.Title
+    console.log("append")
+    fragment.appendChild(p);
+    //document.getElementById("movies").append(p);
+    })
+    document.getElementById("movies").appendChild(fragment)
+    console.log("fragment")
+    
+   
+  
+
 }
